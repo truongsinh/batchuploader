@@ -5,6 +5,7 @@ const expect = chai.expect;
 const chaiHttp = require('chai-http');
 const server = require('../index');
 const processCsvLineModule = require("./processCsvLine");
+const modelReset = require('./model').modelReset;
 
 chai.use(chaiHttp);
 
@@ -12,6 +13,9 @@ describe('CSV', () => {
     beforeEach(() => {
     });
     describe('/GET', () => {
+        afterEach(()=>{
+            modelReset()
+        });
         it('returns data already in DB', (done) => {
             chai.request(server)
                 .get('/csv')
@@ -34,6 +38,41 @@ describe('CSV', () => {
                         });
                     done();
                 });
+        });
+        it('returns status of new batch', (done) => {
+            let input = new Buffer(`Sr.No,Name,email,Phone No,Image Link,Title
+1,Rajeev,Rajiv.sonone@gmail.com,9930858518,https://drive.google.com/open?id=1fj7j15UiO3vneEGYKr2FQi7TqIkOLSq3,Stylefiles Junior
+2,Veena,shveena@rediffmail.com,9819828037,https://drive.google.com/open?id=1HEu1y4MMHbWhY2LQ1BqHXK8fUhBfIba3,Stylefiles Junior`);
+            chai.request(server)
+                .post('/csv')
+                .field("name", "Zolo")
+                .attach('csvFile', input, 'mock.csv')
+                .end((err, res) => {
+                    expect(err).to.be.null;
+                    expect(res).to.have.status(200);
+                    expect(res.body["error"]).to.be.null;
+                    chai.request(server)
+                        .get('/csv')
+                        .end((err, res) => {
+                            expect(err).to.be.null;
+                            expect(res).to.have.status(200);
+                            expect(res.body).to.be.a('object');
+                            expect(res.body).to.have.key("data", "error")
+                            expect(res.body["data"]).to.have.length(2);
+                            expect(res.body["data"][1]).to.deep.equal(
+                                {
+                                    "_id": res.body["data"][1]._id,
+                                    "dateRange": {
+                                        "start": new Date(2016, 2, 5, 6, 7, 8).toISOString(),
+                                        "end": null,
+                                    },
+                                    "status": "incomplete",
+                                    "entryCount": 0,
+                                    "name": "Zolo",
+                                });
+                            done();
+                        });
+                })
         });
     });
     describe('/POST', () => {
