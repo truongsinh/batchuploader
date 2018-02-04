@@ -13,67 +13,124 @@ describe('CSV', () => {
     beforeEach(() => {
     });
     describe('/GET', () => {
-        afterEach(()=>{
+        beforeEach(() => {
+            this.clock = sinon.useFakeTimers(9e11);
+        })
+        afterEach(() => {
+            this.clock.restore();
             modelReset()
+        })
+        context("no processing", () => {
+
+            it('returns data already in DB', (done) => {
+                chai.request(server)
+                    .get('/csv')
+                    .end((err, res) => {
+                        expect(err).to.be.null;
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.be.a('object');
+                        expect(res.body).to.have.key("data", "error")
+                        expect(res.body["data"]).to.have.length(1);
+                        expect(res.body["data"][0]).to.deep.equal(
+                            {
+                                "_id": 5,
+                                "dateRange": {
+                                    "start": new Date(2016, 2, 5, 6, 7, 8).toISOString(),
+                                    "end": new Date(2016, 2, 5, 6, 8, 8).toISOString(),
+                                },
+                                "status": "completed",
+                                "entryCount": 8,
+                                "name": "Etihad",
+                            });
+                        done();
+                    });
+            });
         });
-        it('returns data already in DB', (done) => {
-            chai.request(server)
-                .get('/csv')
-                .end((err, res) => {
-                    expect(err).to.be.null;
+        context("slow processing", () => {
+            it('returns status incomplete of new batch', async () => {
+                let input = new Buffer(`Sr.No,Name,email,Phone No,Image Link,Title
+    1,Rajeev,Rajiv.sonone@gmail.com,9930858518,https://drive.google.com/open?id=1fj7j15UiO3vneEGYKr2FQi7TqIkOLSq3,Stylefiles Junior
+    2,Veena,shveena@rediffmail.com,9819828037,https://drive.google.com/open?id=1HEu1y4MMHbWhY2LQ1BqHXK8fUhBfIba3,Stylefiles Junior`);
+                {
+                    let res = await chai.request(server)
+                        .post('/csv')
+                        .field("name", "Zolo")
+                        .attach('csvFile', input, 'mock.csv')
+                        .send();
+                    expect(res).to.have.status(200);
+                    expect(res.body["error"]).to.be.null;
+                }
+                {
+                    let res = await chai.request(server)
+                        .get('/csv')
+                        .send()
+                        ;
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.a('object');
                     expect(res.body).to.have.key("data", "error")
-                    expect(res.body["data"]).to.have.length(1);
-                    expect(res.body["data"][0]).to.deep.equal(
+                    expect(res.body["data"]).to.have.length(2);
+                    expect(res.body["data"][1]).to.deep.equal(
                         {
-                            "_id": 5,
+                            "_id": res.body["data"][1]._id,
                             "dateRange": {
-                                "start": new Date(2016, 2, 5, 6, 7, 8).toISOString(),
-                                "end": new Date(2016, 2, 5, 6, 8, 8).toISOString(),
+                                "start": "1998-07-09T16:00:00.000Z",
+                                "end": null,
                             },
-                            "status": "completed",
-                            "entryCount": 8,
-                            "name": "Etihad",
+                            "status": "incomplete",
+                            "entryCount": 0,
+                            "name": "Zolo",
                         });
-                    done();
+
+                }
+            });
+        })
+        context("near-immediate processing", () => {
+            let processCsvLineStub;
+            beforeEach(() => {
+                processCsvLineStub = sinon.stub(processCsvLineModule, "processCsvLine");
+                processCsvLineStub.callsFake(() => {
+                    this.clock.tick(9e2)
                 });
-        });
-        it('returns status of new batch', (done) => {
-            let input = new Buffer(`Sr.No,Name,email,Phone No,Image Link,Title
+            })
+            afterEach(() => {
+                processCsvLineStub.restore();
+            })
+
+            it('returns status complete of new batch', async () => {
+                let input = new Buffer(`Sr.No,Name,email,Phone No,Image Link,Title
 1,Rajeev,Rajiv.sonone@gmail.com,9930858518,https://drive.google.com/open?id=1fj7j15UiO3vneEGYKr2FQi7TqIkOLSq3,Stylefiles Junior
 2,Veena,shveena@rediffmail.com,9819828037,https://drive.google.com/open?id=1HEu1y4MMHbWhY2LQ1BqHXK8fUhBfIba3,Stylefiles Junior`);
-            chai.request(server)
-                .post('/csv')
-                .field("name", "Zolo")
-                .attach('csvFile', input, 'mock.csv')
-                .end((err, res) => {
-                    expect(err).to.be.null;
+                {
+                    let res = await chai.request(server)
+                        .post('/csv')
+                        .field("name", "Zulu")
+                        .attach('csvFile', input, 'mock.csv')
+                        .send()
                     expect(res).to.have.status(200);
                     expect(res.body["error"]).to.be.null;
-                    chai.request(server)
+                }
+                {
+                    let res = await chai.request(server)
                         .get('/csv')
-                        .end((err, res) => {
-                            expect(err).to.be.null;
-                            expect(res).to.have.status(200);
-                            expect(res.body).to.be.a('object');
-                            expect(res.body).to.have.key("data", "error")
-                            expect(res.body["data"]).to.have.length(2);
-                            expect(res.body["data"][1]).to.deep.equal(
-                                {
-                                    "_id": res.body["data"][1]._id,
-                                    "dateRange": {
-                                        "start": new Date(2016, 2, 5, 6, 7, 8).toISOString(),
-                                        "end": null,
-                                    },
-                                    "status": "incomplete",
-                                    "entryCount": 0,
-                                    "name": "Zolo",
-                                });
-                            done();
+                        .send();
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.be.a('object');
+                    expect(res.body).to.have.key("data", "error")
+                    expect(res.body["data"]).to.have.length(2);
+                    expect(res.body["data"][1]).to.deep.equal(
+                        {
+                            "_id": res.body["data"][1]._id,
+                            "dateRange": {
+                                "start": "1998-07-09T16:00:00.000Z",
+                                "end": "1998-07-09T16:00:01.800Z",
+                            },
+                            "status": "complete",
+                            "entryCount": 0,
+                            "name": "Zulu",
                         });
-                })
-        });
+                }
+            });
+        })
     });
     describe('/POST', () => {
         let processCsvLineStub;

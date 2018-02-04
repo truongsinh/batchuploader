@@ -28,13 +28,14 @@ async function createBatch(name) {
   mockData[id] = {
     "_id": generateId(),
     "dateRange": {
-      "start": new Date(2016, 2, 5, 6, 7, 8),
+      "start": new Date(),
       "end": null,
     },
     "status": "incomplete",
     "entryCount": 0,
     "name": name,
   };
+  return id;
 }
 exports.createBatch = createBatch;
 
@@ -44,7 +45,8 @@ function generateId() {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
-async function updateBatchComplete(bathId) {
-
+async function updateBatchComplete(batchId) {
+  mockData[batchId].dateRange.end = new Date();
+  mockData[batchId].status = "complete";
 }
 exports.updateBatchComplete = updateBatchComplete;

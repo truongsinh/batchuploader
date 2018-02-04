@@ -59,18 +59,13 @@ function postCsv(req, res) {
         return;
       }
       res.json({ "error": null });
-      // res.json({ "error": null })
-      // recordList.forEach(async (record) => {
-      //   // in the exact order of `name`, `email`, `phone no`, `image link`, `title`
-      //   return processCsvLine(record[0],record[1],record[2],record[3],record[4])
-      // })
-      let batchId = model.createBatch(fields.name);
+      let batchIdPromise = model.createBatch(fields.name);
       for (let index=0; index<recordList.length; index++) {
         let record = recordList[index];
         // in the exact order of `name`, `email`, `phone no`, `image link`, `title`
         await processCsvLineModule.processCsvLine(record[1],record[2],record[3],record[4],record[5])
       }
-      model.updateBatchComplete(batchId);
+      model.updateBatchComplete(await batchIdPromise);
     })
       ;
   });
