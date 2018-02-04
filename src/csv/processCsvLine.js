@@ -1,4 +1,7 @@
-function processCsvLine(name, email, phone, imageUrl, imageTitle){
+// for testing purpose / sinon
+exports.processCsvLine = (name, email, phone, imageUrl, imageTitle) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(resolve, 100);
+  });
 
 }
-exports.processCsvLine = processCsvLine;
