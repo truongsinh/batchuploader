@@ -11,27 +11,38 @@ chai.use(chaiHttp);
 describe('CSV', () => {
     beforeEach(() => {
     });
-    describe('/GET', () => {
-        it('says hello world', (done) => {
+    describe.only('/GET', () => {
+        it('returns data already in DB', (done) => {
             chai.request(server)
                 .get('/csv')
                 .end((err, res) => {
                     expect(err).to.be.null;
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.a('object');
-                    expect(res.body).to.have.key("hello")
-                    expect(res.body["hello"]).to.equal("world");
+                    expect(res.body).to.have.key("data", "error")
+                    expect(res.body["data"]).to.have.length(1);
+                    expect(res.body["data"][0]).to.deep.equal(
+                        {
+                            "_id": 5,
+                            "dateRange": {
+                                "start": new Date(2016, 2, 5, 6, 7, 8).toISOString(),
+                                "end": new Date(2016, 2, 5, 6, 8, 8).toISOString(),
+                            },
+                            "status": "completed",
+                            "entryCount": 8,
+                            "name": "Etihad",
+                        });
                     done();
                 });
         });
     });
     describe('/POST', () => {
         let processCsvLineStub;
-        beforeEach(()=>{
+        beforeEach(() => {
             processCsvLineStub = sinon.stub(processCsvLineModule, "processCsvLine");
             processCsvLineStub.returns();
         })
-        afterEach(()=>{
+        afterEach(() => {
             processCsvLineStub.restore();
         })
         context("unhappy flow", () => {
@@ -184,7 +195,7 @@ Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
                         // @todo email should be case-isensitive
                         sinon.assert.calledWith(processCsvLineStub.getCall(0), "Rajeev", "Rajiv.sonone@gmail.com", "9930858518", "https://drive.google.com/open?id=1fj7j15UiO3vneEGYKr2FQi7TqIkOLSq3", "Stylefiles Junior")
                         sinon.assert.calledWith(processCsvLineStub.getCall(5), "Navya", "amitdhadda@yahoo.co.in", "9867287922", "https://drive.google.com/open?id=1shf810qVpge8vRNiK1VwQGzq6Djy8l61", "Stylefiles Junior")
-                        sinon.assert.calledWith(processCsvLineStub.getCall(9), "Promod", "Panghag1976@gmail.com", "9619118802", "https://drive.google.com/open?id=1InSGbVwXuj2esYHlIf1WjgY7J2MqFkVN", "Stylefiles Junior")             
+                        sinon.assert.calledWith(processCsvLineStub.getCall(9), "Promod", "Panghag1976@gmail.com", "9619118802", "https://drive.google.com/open?id=1InSGbVwXuj2esYHlIf1WjgY7J2MqFkVN", "Stylefiles Junior")
                         done();
                     })
             });
