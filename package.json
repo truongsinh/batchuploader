@@ -1,0 +1,17 @@
+{
+  "name": "batchuploader",
+  "version": "0.0.1",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "test": "find ./src -name '*_test.js' | xargs mocha -R spec --exit"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-http": "^3.0.0",
+    "mocha": "^5.0.0"
+  },
+  "dependencies": {
+    "express": "^4.16.2"
+  }
+}
