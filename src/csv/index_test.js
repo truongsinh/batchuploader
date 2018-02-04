@@ -11,7 +11,7 @@ chai.use(chaiHttp);
 describe('CSV', () => {
     beforeEach(() => {
     });
-    describe.only('/GET', () => {
+    describe('/GET', () => {
         it('returns data already in DB', (done) => {
             chai.request(server)
                 .get('/csv')
@@ -57,9 +57,24 @@ describe('CSV', () => {
                         done();
                     })
             });
+            it('returns error if there is no "name" field', (done) => {
+                chai.request(server)
+                    .post('/csv')
+                    .attach('csvFile', Buffer.from(`Name,email,Phone No,Image Link,Title
+Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
+`), 'mock.csv')
+                    .end((err, res) => {
+                        expect(err).not.to.be.null;
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.have.key("error")
+                        expect(res.body["error"]).to.equal("no batch name");
+                        done();
+                    })
+            });
             it('receives invalid CSV file, 5 columns only', (done) => {
                 chai.request(server)
                     .post('/csv')
+                    .field("name", "Zolo")
                     .attach('csvFile', Buffer.from(`Name,email,Phone No,Image Link,Title
 Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
 `), 'mock.csv')
@@ -74,6 +89,7 @@ Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
             it('receives invalid CSV file, 7 columns', (done) => {
                 chai.request(server)
                     .post('/csv')
+                    .field("name", "Zolo")
                     .attach('csvFile', Buffer.from(`No,ext,Name,email,Phone No,Image Link,Title
 1,2,Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
 `), 'mock.csv')
@@ -89,6 +105,7 @@ Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
             it('receives invalid CSV file, mispell `name`', (done) => {
                 chai.request(server)
                     .post('/csv')
+                    .field("name", "Zolo")
                     .attach('csvFile', Buffer.from(`Sr.No,Nimi,email,Phone No,Image Link,Title
 1,Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
 `), 'mock.csv')
@@ -103,6 +120,7 @@ Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
             it('receives invalid CSV file, mispell `email`', (done) => {
                 chai.request(server)
                     .post('/csv')
+                    .field("name", "Zolo")
                     .attach('csvFile', Buffer.from(`Sr.No,Name,electronic,Phone No,Image Link,Title
 1,Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
 `), 'mock.csv')
@@ -117,6 +135,7 @@ Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
             it('receives invalid CSV file, mispell `phone no`', (done) => {
                 chai.request(server)
                     .post('/csv')
+                    .field("name", "Zolo")
                     .attach('csvFile', Buffer.from(`Sr.No,Name,email,Phne No,Image Link,Title
 1,Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
 `), 'mock.csv')
@@ -131,6 +150,7 @@ Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
             it('receives invalid CSV file, mispell `image link`', (done) => {
                 chai.request(server)
                     .post('/csv')
+                    .field("name", "Zolo")
                     .attach('csvFile', Buffer.from(`Sr.No,Name,email,Phone No,Imge Link,Title
 1,Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
 `), 'mock.csv')
@@ -145,6 +165,7 @@ Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
             it('receives invalid CSV file, mispell `title`', (done) => {
                 chai.request(server)
                     .post('/csv')
+                    .field("name", "Zolo")
                     .attach('csvFile', Buffer.from(`Sr.No,Name,email,Phone No,Image Link,Ttle
 1,Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
 `), 'mock.csv')
@@ -159,6 +180,7 @@ Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
             it('receives invalid CSV file, inconsistent columns', (done) => {
                 chai.request(server)
                     .post('/csv')
+                    .field("name", "Zolo")
                     .attach('csvFile', Buffer.from(`Sr.No,Name,email,Phone No,Image Link,Title
 Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
 `), 'mock.csv')
@@ -186,6 +208,7 @@ Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
 10,Promod,Panghag1976@gmail.com,9619118802,https://drive.google.com/open?id=1InSGbVwXuj2esYHlIf1WjgY7J2MqFkVN,Stylefiles Junior`);
                 chai.request(server)
                     .post('/csv')
+                    .field("name", "Zolo")
                     .attach('csvFile', input, 'mock.csv')
                     .end((err, res) => {
                         expect(err).to.be.null;

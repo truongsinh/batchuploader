@@ -5,7 +5,6 @@ async function getCsv(req, res) {
     res.json({ error: null, data: data });
   }
   catch(err) {
-    console.log(err)
     res.json({ error: err });
   }
 }

@@ -3,6 +3,7 @@ const formidable = require('formidable');
 const util = require('util');
 const parse = require('csv-parse');
 const fs = require('fs');
+const model = require("./model");
 // const processCsvLine = require("./processCsvLine").processCsvLine;
 // cannot use the above line for testing purpose.
 // Damn! ES6 import `import {processCsvLine} from "./processCsvLine" would have been great!
@@ -16,6 +17,12 @@ function postCsv(req, res) {
       res.json({ "error": "no attachment" });
       return;
     }
+    if (!fields.hasOwnProperty('name')) {
+      res.status(400);
+      res.json({ "error": "no batch name" });
+      return;
+    }
+    
     // @todo assume files.csvFile has "path"
     let input = fs.createReadStream(files.csvFile.path, { encoding: "utf8" });
     let parser = parse();
