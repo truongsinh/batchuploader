@@ -9,7 +9,8 @@ app.use(bodyParser.text());
 app.use(bodyParser.json({ type: 'application/json' }));
 
 app.route("/csv")
-  .get(csvModule.getCsv)
+.get(csvModule.getCsv)
+.post(csvModule.postCsv)
   ;
 
 app.listen(port);
