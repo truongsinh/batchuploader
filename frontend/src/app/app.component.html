@@ -1,0 +1,18 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<h1>Batch info</h1>
+<table>
+  <tr>
+      <th>Name</th>
+      <th>Date start</th>
+      <th>Date end</th>
+      <th>Status</th>
+      <th># of entry</th>
+  </tr>
+  <tr *ngFor="let batch of batches">
+      <td>{{batch.name}}</td>
+      <td>{{batch.dateRange.start | date:'short'}}</td>
+      <td>{{batch.dateRange.end | date:'short'}}</td>
+      <td>{{batch.status}}</td>
+      <td>{{batch.entryCount}}</td>
+  </tr>
+</table>

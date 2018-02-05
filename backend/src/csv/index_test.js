@@ -125,6 +125,7 @@ describe('CSV', () => {
                                 "end": "1998-07-09T16:00:01.800Z",
                             },
                             "status": "complete",
+                            // @todo
                             "entryCount": 0,
                             "name": "Zulu",
                         });
