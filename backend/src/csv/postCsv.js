@@ -65,7 +65,7 @@ function postCsv(req, res) {
         // in the exact order of `name`, `email`, `phone no`, `image link`, `title`
         await processCsvLineModule.processCsvLine(record[1],record[2],record[3],record[4],record[5])
       }
-      model.updateBatchComplete(await batchIdPromise);
+      model.updateBatchComplete(await batchIdPromise, recordList.length);
     })
       ;
   });

@@ -1,0 +1,29 @@
+{
+  "name": "batchuploader",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "yarn": "npm run yarn:frontend && npm run yarn:backend",
+    "yarn:frontend": "cd frontend; yarn install",
+    "yarn:backend": "cd backend; yarn install",
+    "test:backend": "cd backend; npm test",
+    "test:frontend": "npm run test:frontend:unit && npm run test:frontend:e2e",
+    "test:frontend:unit": "cd frontend; npm test --  --watch=false",
+    "test:frontend:e2e": "cd frontend; npm run e2e",
+    "test": "npm run test:backend && npm run test:frontend",
+    "start:frontend": "cd frontend; npm start",
+    "start:backend": "cd backend; npm start",
+    "start": "npm run start:backend | npm run start:frontend"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/truongsinh/batchuploader.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/truongsinh/batchuploader/issues"
+  },
+  "homepage": "https://github.com/truongsinh/batchuploader#readme"
+}

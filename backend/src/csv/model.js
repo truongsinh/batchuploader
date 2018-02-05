@@ -8,7 +8,7 @@ function modelReset() {
         "start": new Date(2016, 2, 5, 6, 7, 8),
         "end": new Date(2016, 2, 5, 6, 8, 8),
       },
-      "status": "completed",
+      "status": "complete",
       "entryCount": 8,
       "name": "Etihad",
     }
@@ -45,8 +45,9 @@ function generateId() {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
-async function updateBatchComplete(batchId) {
+async function updateBatchComplete(batchId, length) {
   mockData[batchId].dateRange.end = new Date();
   mockData[batchId].status = "complete";
+  mockData[batchId].entryCount = length;
 }
 exports.updateBatchComplete = updateBatchComplete;

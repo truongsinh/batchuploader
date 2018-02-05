@@ -24,7 +24,7 @@ describe('CSV', () => {
 
             it('returns data already in DB', (done) => {
                 chai.request(server)
-                    .get('/csv')
+                    .get('/api/csv')
                     .end((err, res) => {
                         expect(err).to.be.null;
                         expect(res).to.have.status(200);
@@ -38,7 +38,7 @@ describe('CSV', () => {
                                     "start": new Date(2016, 2, 5, 6, 7, 8).toISOString(),
                                     "end": new Date(2016, 2, 5, 6, 8, 8).toISOString(),
                                 },
-                                "status": "completed",
+                                "status": "complete",
                                 "entryCount": 8,
                                 "name": "Etihad",
                             });
@@ -53,7 +53,7 @@ describe('CSV', () => {
     2,Veena,shveena@rediffmail.com,9819828037,https://drive.google.com/open?id=1HEu1y4MMHbWhY2LQ1BqHXK8fUhBfIba3,Stylefiles Junior`);
                 {
                     let res = await chai.request(server)
-                        .post('/csv')
+                        .post('/api/csv')
                         .field("name", "Zolo")
                         .attach('csvFile', input, 'mock.csv')
                         .send();
@@ -62,7 +62,7 @@ describe('CSV', () => {
                 }
                 {
                     let res = await chai.request(server)
-                        .get('/csv')
+                        .get('/api/csv')
                         .send()
                         ;
                     expect(res).to.have.status(200);
@@ -102,7 +102,7 @@ describe('CSV', () => {
 2,Veena,shveena@rediffmail.com,9819828037,https://drive.google.com/open?id=1HEu1y4MMHbWhY2LQ1BqHXK8fUhBfIba3,Stylefiles Junior`);
                 {
                     let res = await chai.request(server)
-                        .post('/csv')
+                        .post('/api/csv')
                         .field("name", "Zulu")
                         .attach('csvFile', input, 'mock.csv')
                         .send()
@@ -111,7 +111,7 @@ describe('CSV', () => {
                 }
                 {
                     let res = await chai.request(server)
-                        .get('/csv')
+                        .get('/api/csv')
                         .send();
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.a('object');
@@ -125,8 +125,7 @@ describe('CSV', () => {
                                 "end": "1998-07-09T16:00:01.800Z",
                             },
                             "status": "complete",
-                            // @todo
-                            "entryCount": 0,
+                            "entryCount": 2,
                             "name": "Zulu",
                         });
                 }
@@ -145,7 +144,7 @@ describe('CSV', () => {
         context("unhappy flow", () => {
             it('returns error if there is no CSV file attached', (done) => {
                 chai.request(server)
-                    .post('/csv')
+                    .post('/api/csv')
                     .end((err, res) => {
                         expect(err).not.to.be.null;
                         expect(res).to.have.status(400);
@@ -156,7 +155,7 @@ describe('CSV', () => {
             });
             it('returns error if there is no "name" field', (done) => {
                 chai.request(server)
-                    .post('/csv')
+                    .post('/api/csv')
                     .attach('csvFile', Buffer.from(`Name,email,Phone No,Image Link,Title
 Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
 `), 'mock.csv')
@@ -170,7 +169,7 @@ Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
             });
             it('receives invalid CSV file, 5 columns only', (done) => {
                 chai.request(server)
-                    .post('/csv')
+                    .post('/api/csv')
                     .field("name", "Zolo")
                     .attach('csvFile', Buffer.from(`Name,email,Phone No,Image Link,Title
 Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
@@ -185,7 +184,7 @@ Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
             });
             it('receives invalid CSV file, 7 columns', (done) => {
                 chai.request(server)
-                    .post('/csv')
+                    .post('/api/csv')
                     .field("name", "Zolo")
                     .attach('csvFile', Buffer.from(`No,ext,Name,email,Phone No,Image Link,Title
 1,2,Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
@@ -201,7 +200,7 @@ Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
             // Name, Email, phone, Public google drive Image url, Image title
             it('receives invalid CSV file, mispell `name`', (done) => {
                 chai.request(server)
-                    .post('/csv')
+                    .post('/api/csv')
                     .field("name", "Zolo")
                     .attach('csvFile', Buffer.from(`Sr.No,Nimi,email,Phone No,Image Link,Title
 1,Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
@@ -216,7 +215,7 @@ Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
             });
             it('receives invalid CSV file, mispell `email`', (done) => {
                 chai.request(server)
-                    .post('/csv')
+                    .post('/api/csv')
                     .field("name", "Zolo")
                     .attach('csvFile', Buffer.from(`Sr.No,Name,electronic,Phone No,Image Link,Title
 1,Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
@@ -231,7 +230,7 @@ Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
             });
             it('receives invalid CSV file, mispell `phone no`', (done) => {
                 chai.request(server)
-                    .post('/csv')
+                    .post('/api/csv')
                     .field("name", "Zolo")
                     .attach('csvFile', Buffer.from(`Sr.No,Name,email,Phne No,Image Link,Title
 1,Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
@@ -246,7 +245,7 @@ Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
             });
             it('receives invalid CSV file, mispell `image link`', (done) => {
                 chai.request(server)
-                    .post('/csv')
+                    .post('/api/csv')
                     .field("name", "Zolo")
                     .attach('csvFile', Buffer.from(`Sr.No,Name,email,Phone No,Imge Link,Title
 1,Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
@@ -261,7 +260,7 @@ Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
             });
             it('receives invalid CSV file, mispell `title`', (done) => {
                 chai.request(server)
-                    .post('/csv')
+                    .post('/api/csv')
                     .field("name", "Zolo")
                     .attach('csvFile', Buffer.from(`Sr.No,Name,email,Phone No,Image Link,Ttle
 1,Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
@@ -276,7 +275,7 @@ Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
             });
             it('receives invalid CSV file, inconsistent columns', (done) => {
                 chai.request(server)
-                    .post('/csv')
+                    .post('/api/csv')
                     .field("name", "Zolo")
                     .attach('csvFile', Buffer.from(`Sr.No,Name,email,Phone No,Image Link,Title
 Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
@@ -304,7 +303,7 @@ Rajeev,Rajiv.sonone@gmail.com,9930858518,https://example.com,Stylefiles Junior
 9,Sneha,6@shopholix.com,9819324081,https://drive.google.com/open?id=1e_0BIg5CPip4uXPCmkcMFsGVvFN4eX98,Stylefiles Junior
 10,Promod,Panghag1976@gmail.com,9619118802,https://drive.google.com/open?id=1InSGbVwXuj2esYHlIf1WjgY7J2MqFkVN,Stylefiles Junior`);
                 chai.request(server)
-                    .post('/csv')
+                    .post('/api/csv')
                     .field("name", "Zolo")
                     .attach('csvFile', input, 'mock.csv')
                     .end((err, res) => {

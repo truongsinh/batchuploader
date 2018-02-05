@@ -1,18 +1,38 @@
 <!--The content below is only a placeholder and can be replaced.-->
 <h1>Batch info</h1>
+<span>Filter by:
+    <ul>
+        <li>
+            <span>Status</span>
+            <select [(ngModel)]="filterByStatus" (ngModelChange)="onFilterSelect(filterByStatus)">
+                <option *ngFor="let option of statusOption" [value]="option">
+                    {{ option }}
+                </option>
+            </select>
+        </li>
+    </ul>
+</span>
 <table>
-  <tr>
-      <th>Name</th>
-      <th>Date start</th>
-      <th>Date end</th>
-      <th>Status</th>
-      <th># of entry</th>
-  </tr>
-  <tr *ngFor="let batch of batches">
-      <td>{{batch.name}}</td>
-      <td>{{batch.dateRange.start | date:'short'}}</td>
-      <td>{{batch.dateRange.end | date:'short'}}</td>
-      <td>{{batch.status}}</td>
-      <td>{{batch.entryCount}}</td>
-  </tr>
+    <tr>
+        <th>Name</th>
+        <th>Date start</th>
+        <th>Date end</th>
+        <th>Status</th>
+        <th># of entry</th>
+    </tr>
+    <tr *ngFor="let batch of batches | statusfilter:statusFilterArg">
+        <td>{{batch.name}}</td>
+        <td>{{batch.dateRange.start | date:'short'}}</td>
+        <td>{{batch.dateRange.end | date:'short'}}</td>
+        <td>{{batch.status}}</td>
+        <td>{{batch.entryCount}}</td>
+    </tr>
 </table>
+<form #yourForm="ngForm" (ngSubmit)="onSubmit()">
+    <input type="text" [(ngModel)]="name" name="name" />
+    <input type="file" #fileupload [(ngModel)]="fileNativeElement" name="fileNativeElement" (change)="fileChange(fileupload.files)"
+    />
+    <button type="submit">Submit</button>
+    <label>{{this.message}}</label>
+</form>
+<!-- <input type="file" (change)="fileChange($event)" placeholder="Upload file" accept=".csv"> -->

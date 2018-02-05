@@ -5,7 +5,7 @@ type batchModel = {
         "start": Date,
         "end": Date,
     },
-    "status": "completed" | "incomplete" | "error",
+    "status": "complete" | "incomplete" | "error",
     "entryCount": number,
     "name": string,
 };
@@ -17,7 +17,7 @@ export const batches: batchModel[] = [
             "start": new Date(2016, 2, 5, 6, 7, 8),
             "end": new Date(2016, 2, 5, 6, 8, 8),
         },
-        "status": "completed",
+        "status": "complete",
         "entryCount": 8,
         "name": "Etihad",
     },

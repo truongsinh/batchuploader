@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "start": "node src/index",
     "test": "find ./src -name '*_test.js' | xargs mocha -R spec --exit"
   },
   "devDependencies": {
