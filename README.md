@@ -1,4 +1,7 @@
 # Requirement
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/truongsinh/batchuploader.svg)](https://greenkeeper.io/)
+
 NodeJS 9+ and Yarn; remember to run `npm run yarn` to install dependencies before
 running test and dev server
 
